@@ -26,7 +26,7 @@ export default function LikedContent({ songs }: Props) {
   if (songs.length === 0) {
     return (
       <div className="flex w-full flex-col gap-y-2 px-6 text-neutral-400">
-        No liked songs
+        Нет понравившихся треков 
       </div>
     );
   }

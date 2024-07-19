@@ -7,6 +7,7 @@ export type Song = {
   title: string;
   song_path: string;
   image_path: string;
+  duration: string;
 };
 
 export type UserDetails = {

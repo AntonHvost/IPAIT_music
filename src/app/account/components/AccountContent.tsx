@@ -38,9 +38,9 @@ export default function AccountContent() {
     <div className="mb-7 px-6">
       {!subscription && (
         <div className="flex flex-col gap-y-4">
-          <p>No active plan.</p>
+          <p>Нет активного плана.</p>
           <Button onClick={onOpen} className="w-[300px]">
-            Subscribe
+            Подписаться
           </Button>
         </div>
       )}
@@ -55,7 +55,7 @@ export default function AccountContent() {
             onClick={redirectToCustomerPortal}
             className="w-[300px]"
           >
-            Open customer portal
+            Не работает XD
           </Button>
         </div>
       )}

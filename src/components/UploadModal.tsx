@@ -11,6 +11,8 @@ import { useUser } from "../hooks/useUser";
 import Button from "./Button";
 import Input from "./Input";
 import Modal from "./Modal";
+import { parseBuffer } from 'music-metadata-browser';
+import { Tomorrow } from "next/font/google";
 
 export default function UploadModal() {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,6 +20,7 @@ export default function UploadModal() {
   const { isOpen, onClose } = useUploadModal();
   const router = useRouter();
   const { user } = useUser();
+  const moment = require('moment');
 
   const { register, handleSubmit, reset } = useForm<FieldValues>({
     defaultValues: {
@@ -44,8 +47,22 @@ export default function UploadModal() {
         toast.error("Missing fields");
         return;
       }
+      
       const uniqueID = uniqid();
 
+      let tmp_duration;
+      let duration;
+
+      try {
+        const arrayBuffer = await songFile.arrayBuffer();
+        const metadata = await parseBuffer(new Uint8Array(arrayBuffer), songFile.type);
+        tmp_duration = metadata.format.duration ? Math.ceil(metadata.format.duration) : 0;
+        duration = moment.utc(tmp_duration * 1000).format('HH:mm:ss');
+        console.log(duration);
+      } catch (error) {
+        console.error("Error parsing song metadata:", error);
+        duration = 0;
+      }
       // upload song
       const { data: songData, error: songError } = await supabaseClient.storage
         .from("songs")
@@ -79,6 +96,7 @@ export default function UploadModal() {
           author: values.author,
           image_path: imageData.path,
           song_path: songData.path,
+          duration: duration,
         });
       if (supabaseError) {
         setIsLoading(false);

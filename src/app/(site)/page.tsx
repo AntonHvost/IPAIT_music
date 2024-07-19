@@ -2,6 +2,7 @@ import { getSongs } from "../../actions/getSongs";
 import Header from "../../components/Header";
 import ListItem from "../../components/ListItem";
 import PageContent from "./components/PageContent";
+import socket from '../api/socket';
 
 export const revalidate = 0;
 
@@ -9,7 +10,7 @@ export default async function Home() {
   const songs = await getSongs();
 
   return (
-    <div className="h-full w-full overflow-hidden overflow-y-auto rounded-lg bg-neutral-900">
+    <div className="h-full w-full overflow-hidden overflow-y-auto rounded-lg bg-delft_blue">
       <Header>
         <div className="mb-2">
           <h1 className="text-3xl font-semibold text-white">Welcome back</h1>

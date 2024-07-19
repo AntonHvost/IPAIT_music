@@ -120,6 +120,7 @@ export interface Database {
           song_path: string | null;
           title: string | null;
           user_id: string | null;
+          duration: string | null;
         };
         Insert: {
           author?: string | null;

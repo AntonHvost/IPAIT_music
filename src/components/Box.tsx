@@ -13,7 +13,7 @@ export default function Box({ children, className }: Props) {
           h-fit
           w-full
           rounded-lg
-          bg-neutral-900
+          bg-delft_blue
         `,
         className
       )}
