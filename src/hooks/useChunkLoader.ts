@@ -21,7 +21,7 @@ useEffect(() => {
   socket.onopen = () => {
     console.log('WebSocket connection established');
     wsRef.current = socket;
-    fetchAndAppendChunk(0);
+    requestNextChunk(0);
   };
   socket.onclose = () => {
     console.log('WebSocket connection closed');
@@ -62,14 +62,20 @@ useEffect(() => {
   };
 }, [songId]);
 
-const fetchAndAppendChunk = (startByte: number) => {
+const requestNextChunk = (startByte: number) => {
+  if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && !fullFileDownloaded) {
+    wsRef.current.send(JSON.stringify({ songId, startByte }));
+  }
+};
+
+/*const fetchAndAppendChunk = (startByte: number) => {
   if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && !fullFileDownloaded) {
     wsRef.current.send(JSON.stringify({ songId, startByte}));
     //console.log(`Requested chunk from byte ${startByte}`);
   } else {
     console.warn('WebSocket is not open. Cannot fetch chunk.');
   }
-};
+};*/
 
 const processReceivedChunks = () => {
   receivedChunks.sort((a, b) => a.id - b.id);
@@ -85,8 +91,10 @@ const appendPendingChunks = () => {
     const { chunk } = pendingChunks.shift()!;
     sourceBufferRef.current.appendBuffer(new Uint8Array(chunk));
     loadedBytes += chunk.byteLength;
+    isAppending = false;
+    appendPendingChunks();
     
-    //console.log(`Loaded bytes: ${loadedBytes}`);
+    console.log(`Loaded bytes: ${loadedBytes}`);
   }
 };
 
@@ -106,7 +114,7 @@ const appendPendingChunks = () => {
       audio.addEventListener('timeupdate', async () => {
         const bufferedEnd = audio.buffered.end(audio.buffered.length - 1);
         if (audio.currentTime > bufferedEnd - 40 && !fullFileDownloaded) {
-          await fetchAndAppendChunk(loadedBytes);
+          await requestNextChunk(loadedBytes);
         }
       });
     };
@@ -129,7 +137,7 @@ const appendPendingChunks = () => {
         if (fileSizeRef.current) { 
         bytePosition = Math.floor((value / duration) * fileSizeRef.current!);
         if (bytePosition <= fileSizeRef.current && !fullFileDownloaded) {
-        await fetchAndAppendChunk(bytePosition);
+        await requestNextChunk(bytePosition);
       } else {
         console.warn(`Attempted to fetch beyond file size. Byte position: ${bytePosition}, File size: ${fileSizeRef.current}`);
       }

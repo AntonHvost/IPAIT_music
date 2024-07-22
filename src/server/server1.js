@@ -4,16 +4,20 @@ const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 const WebSocket = require('ws');
 const http = require('http');
+require('dotenv').config();
 
 const app = express();
+
 const server = http.createServer(app);
 const wss = new WebSocket.Server({server});
 
 const cors = require('cors');
 const { data } = require('autoprefixer');
 const e = require('express');
-const supabaseUrl = 'https://ihlnjluvhimtwklrixbg.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlobG5qbHV2aGltdHdrbHJpeGJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjExMzcyODgsImV4cCI6MjAzNjcxMzI4OH0.MPBffTzRBj086odxgZMUTVskWVgnVOyIyqkLV9m56Wc';
+
+const supabaseUrl = "https://ihlnjluvhimtwklrixbg.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlobG5qbHV2aGltdHdrbHJpeGJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjExMzcyODgsImV4cCI6MjAzNjcxMzI4OH0.MPBffTzRBj086odxgZMUTVskWVgnVOyIyqkLV9m56Wc";
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 
@@ -59,12 +63,22 @@ const deleteExpiredTempFiles = () => {
 // Set interval to check and delete expired temporary files every hour
 setInterval(deleteExpiredTempFiles, FILE_EXPIRATION_TIME);
 
+const connections = new Map();
+
 wss.on('connection', (ws) => {
     console.log('New WebSocket connection');
 
     ws.on('message', async (message) => {
-        const { songId, startByte} = JSON.parse(message);
+        const {songId} = JSON.parse(message);
         tempId = songId ? songId : 0;
+        
+        if (!connections.has(ws)) {
+            connections.set(ws, { songId, loadedBytes: 0 });
+        }
+
+        const connection = connections.get(ws);
+        const startByte = connection.loadedBytes;
+
         const tempFilePath = path.join(TEMP_FOLDER, `${songId}.mp3`);
 
         try {
@@ -131,6 +145,10 @@ function streamFile(filePath, startByte, ws) {
     });
 
     fileStream.on('end', () => {
+        const connection = connections.get(ws);
+        if (connection) {
+            connection.loadedBytes = end + 1;
+        }
         if (startByte > fileSize - 1) {
             console.log(`Completed streaming file. Ended at byte ${end}`);
             ws.send(JSON.stringify({done: true}));
