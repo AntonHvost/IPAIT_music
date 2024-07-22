@@ -4,7 +4,6 @@ const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 const WebSocket = require('ws');
 const http = require('http');
-require('dotenv').config();
 
 const app = express();
 
@@ -134,10 +133,10 @@ function streamFile(filePath, startByte, ws) {
     }
 
     const end = Math.min(startByte + chunkSize - 1, fileSize - 1);
-    const chunksize = (end - startByte) + 1;
+    //const chunksize = (end - startByte) + 1;
     const fileStream = fs.createReadStream(filePath, { start: startByte, end: end });
 
-    ws.send(JSON.stringify({ fileSize, startByte, end, chunksize }));
+    ws.send(JSON.stringify({ fileSize, startByte, end, chunkSize }));
 
     fileStream.on('data', (chunk) => {
         ws.send(chunk);
