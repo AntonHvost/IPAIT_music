@@ -25,7 +25,6 @@ export default function PlayerContent({ song/*, songUrl*/}: Props) {
   const [volume, setVolume] = useState(1);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [fullFileDownloaded, setFullFileDownloaded] = useState(false);
   //const [sourceBuffer, setSourceBuffer] = useState<SourceBuffer | null>(null);
 
   const Icon = isPlaying ? BsPauseFill : BsPlayFill;
@@ -33,32 +32,40 @@ export default function PlayerContent({ song/*, songUrl*/}: Props) {
 
   let dur_time = moment.duration(song.duration);
   const dur_sec = dur_time.isValid() ? dur_time.asSeconds() : 0;
+  let durationTime = <span className="w-[80px]">{`${moment.utc(dur_sec * 1000).format('HH:mm:ss')}`}</span>;
   const dur_millisec = dur_time.isValid() ? dur_time.asMilliseconds() : 0;
 
   const { audioRef, handleSeek } = useChunkLoader(song.id, dur_millisec);
-
   const onPlayNext = () => {
+    console.log("onPlayNext called");
     if (ids.length === 0) {
       return;
     }
     const currentIndex = ids.findIndex((id) => id === activeId);
-    const nextSong = ids[currentIndex + 1];
+    const nextIndex = (currentIndex + 1) % ids.length;
+    const nextSong = ids[nextIndex];
     if (!nextSong) {
       return setId(ids[0]);
     }
+    console.log("Next song ID:", nextSong);
     setId(nextSong);
   };
 
   const onPlayPrevious = () => {
+    console.log("onPlayPrevious called");
     if (ids.length === 0) {
       return;
     }
     const currentIndex = ids.findIndex((id) => id === activeId);
-    const previousSong = ids[currentIndex - 1];
+    const previousIndex = (currentIndex - 1 + ids.length) % ids.length;
+    const previousSong = ids[previousIndex];
     if (!previousSong) {
+      console.log(ids, activeId);
       return setId(ids[ids.length - 1]);
     }
+    console.log("Previous song ID:", previousSong);
     setId(previousSong);
+    console.log(ids, activeId);
   };
 
   const handlePlayPause = () => {
@@ -84,15 +91,15 @@ export default function PlayerContent({ song/*, songUrl*/}: Props) {
     const audio = audioRef.current;
     const updateProgress = () => {
       setProgress(audio.currentTime);
-      
     };
 
     setDuration(dur_sec);
 
     audio.addEventListener("timeupdate", updateProgress);
-
+    audio.addEventListener("ended", onPlayNext);
     return () => {
       audio.removeEventListener("timeupdate", updateProgress);
+      audio.removeEventListener("ended", onPlayNext);
     };
   }, [dur_sec]);
 
@@ -100,7 +107,7 @@ export default function PlayerContent({ song/*, songUrl*/}: Props) {
     const audio = audioRef.current;
     audio.play();
     setIsPlaying(true);
-  }, []);
+  }, [audioRef, activeId]);
 
   return (
     <div className="grid h-full grid-cols-2 grid-rows-2 md:grid-cols-3">
@@ -147,7 +154,11 @@ export default function PlayerContent({ song/*, songUrl*/}: Props) {
         </div>
       </div>
       <div className="col-span-2 md:col-span-3 mt-2 ">
-          <SliderSong value={progress} max={duration} onChange={handleSeek} />
+        <div className="flex justify-center">
+        <span className="w-[80px]">{`${moment.utc(Math.ceil(progress) * 1000).format('HH:mm:ss')}`}</span>
+          <div className="w-[80%]"><SliderSong value={progress} max={duration} onChange={handleSeek} /></div>
+          {durationTime}
+          </div>
       </div>
     </div>
   );

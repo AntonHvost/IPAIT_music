@@ -47,12 +47,6 @@ export default function Sidebar({ children, songs }: Props) {
   const routes = useMemo(
     () => [
       {
-        icon: FaUserAlt,
-        label: "Аккаунт",
-        active: pathname === "/account",
-        href: "/account",
-      },
-      {
         icon: HiHome,
         label: "Главная",
         active: pathname === "/",

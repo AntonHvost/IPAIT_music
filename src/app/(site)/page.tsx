@@ -13,7 +13,7 @@ export default async function Home() {
     <div className="h-full w-full overflow-hidden overflow-y-auto rounded-lg bg-delft_blue">
       <Header>
         <div className="mb-2">
-          <h1 className="text-3xl font-semibold text-white">Welcome back</h1>
+          <h1 className="text-3xl font-semibold text-white">Добро пожаловать</h1>
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             <ListItem
               image="/images/liked.png"
@@ -25,7 +25,7 @@ export default async function Home() {
       </Header>
       <div className="mb-7 mt-2 px-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-white">Newest songs</h1>
+          <h1 className="text-2xl font-semibold text-white">Новые треки</h1>
         </div>
         <PageContent songs={songs} />
       </div>

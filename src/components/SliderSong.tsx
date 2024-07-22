@@ -14,7 +14,7 @@ export default function Slider({ value, max, onChange }: Props) {
     console.log(max);
   };
   return (
-    <input
+      <input
       type="range"
       min="0"
       max={max}
@@ -22,6 +22,7 @@ export default function Slider({ value, max, onChange }: Props) {
       onChange={handleSliderChange}
       className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer"
     />
+    
     /*<Root
       className="relative flex h-10 w-full touch-none select-none items-center"
       defaultValue={[1]}

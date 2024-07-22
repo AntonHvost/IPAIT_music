@@ -22,9 +22,9 @@ export default async function Liked() {
               />
             </div>
             <div className="mt-4 flex flex-col gap-y-2 md:mt-0">
-              <p className="hidden text-sm font-semibold md:block">Playlist</p>
+              <p className="hidden text-sm font-semibold md:block">Плейлист</p>
               <h1 className="text-4xl font-bold text-white sm:text-5xl lg:text-7xl">
-                Liked Songs
+                Понравившиеся песни
               </h1>
             </div>
           </div>

@@ -1,7 +1,11 @@
-import axios from 'axios';
+//import axios from 'axios';
+import { useEffect, useRef, useState } from "react";
 
 async function loadSongChunks(songId: string, startByte: number) {
-  try {
+
+
+
+  /*try {
     const response = await axios.get(`http://localhost:3001/music/${songId}`, {
       responseType: 'arraybuffer',
       headers: {
@@ -19,7 +23,7 @@ async function loadSongChunks(songId: string, startByte: number) {
   } catch (error) {
     console.error('Error fetching song chunk:', error);
     return null;
-  }
+  }*/
 }
 
 export default loadSongChunks;

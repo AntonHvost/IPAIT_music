@@ -34,8 +34,8 @@ export default function AuthModal() {
     <Modal
       isOpen={isOpen}
       onChange={onChange}
-      title="Welcome back"
-      description="Login to your account"
+      title="Добро пожаловать"
+      description="Вход в аккаунт"
     >
       <Auth
         supabaseClient={supabaseClient}
@@ -47,7 +47,7 @@ export default function AuthModal() {
             default: {
               colors: {
                 brand: "#404040",
-                brandAccent: "#22c55e",
+                brandAccent: "#FC8BFD",
               },
             },
           },

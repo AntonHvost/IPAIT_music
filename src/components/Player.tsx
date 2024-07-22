@@ -8,18 +8,8 @@ import PlayerContent from "./PlayerContent";
 export default function Player() {
   const player = usePlayer();
   const { song } = useGetSongById(player.activeId); 
-  /*const [songUrl, setSongUrl] = useState<string | null>(null);
-  useEffect(() => {
-    const loadSongUrl = async () => {
-      if (song) {
-        const url = await useLoadSongUrl(song);
-        setSongUrl(url || null);
-      }
-    };
-    loadSongUrl();
-  }, [song]);*/
 
-  if (!song /*|| !songUrl*/ || !player.activeId) {
+  if (!song || !player.activeId) {
     return null;
   }
 

@@ -89,12 +89,12 @@ export default function Header({ children, className }: Props) {
                   onClick={onOpen}
                   className="bg-transparent font-medium text-neutral-300"
                 >
-                  Sign up
+                  Регистрация
                 </Button>
               </div>
               <div>
                 <Button onClick={onOpen} className="bg-white px-6 py-2 ">
-                  Log in
+                  Вход
                 </Button>
               </div>
             </>
