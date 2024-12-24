@@ -23,6 +23,103 @@ export type Props = {
 };
 
 export function MyUserContextProvider(props: Props) {
+ /* const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [user, setUser] = useState<UserDetails | null>(null);
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Fetch user details from the backend
+  async function fetchUserDetails() {
+    try {
+      const response = await fetch("http://localhost:8080/api/user/details", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user details");
+      }
+
+      const data = await response.json();
+      return data as UserDetails;
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+      return null;
+    }
+  }
+
+  // Fetch subscription details from the backend
+  async function fetchSubscription() {
+    try {
+      const response = await fetch(
+        "http://localhost:8080/api/subscriptions/current",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch subscription details");
+      }
+
+      const data = await response.json();
+      return data as Subscription;
+    } catch (error) {
+      console.error("Error fetching subscription:", error);
+      return null;
+    }
+  }
+
+  useEffect(() => {
+    async function initialize() {
+      setIsLoading(true);
+
+      try {
+        // Retrieve access token (from localStorage, for example)
+        const storedToken = localStorage.getItem("authToken");
+        if (!storedToken) {
+          throw new Error("No access token found");
+        }
+
+        setAccessToken(storedToken);
+
+        // Fetch user details and subscription in parallel
+        const [userDetails, subscription] = await Promise.all([
+          fetchUserDetails(),
+          fetchSubscription(),
+        ]);
+
+        setUser(userDetails);
+        setUserDetails(userDetails);
+        setSubscription(subscription);
+      } catch (error) {
+        console.error("Error initializing user context:", error);
+        setUser(null);
+        setUserDetails(null);
+        setSubscription(null);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    initialize();
+  }, [accessToken]);
+
+  const value = {
+    accessToken,
+    user,
+    userDetails,
+    isLoading,
+    subscription,
+  };
+
+  return <UserContext.Provider value={value} {...props} />;*/
   const {
     session,
     isLoading: isLoadingUser,

@@ -35,7 +35,7 @@ export default function PlayerContent({ song/*, songUrl*/}: Props) {
   let durationTime = <span className="w-[80px]">{`${moment.utc(dur_sec * 1000).format('HH:mm:ss')}`}</span>;
   const dur_millisec = dur_time.isValid() ? dur_time.asMilliseconds() : 0;
 
-  const { audioRef, handleSeek } = useChunkLoader(song.id, dur_millisec);
+  const { audioRef, handleSeek, loadingProgress} = useChunkLoader(song.id, dur_millisec);
   const onPlayNext = () => {
     console.log("onPlayNext called");
     if (ids.length === 0) {
@@ -91,6 +91,7 @@ export default function PlayerContent({ song/*, songUrl*/}: Props) {
     const audio = audioRef.current;
     const updateProgress = () => {
       setProgress(audio.currentTime);
+      
     };
 
     setDuration(dur_sec);
@@ -102,6 +103,7 @@ export default function PlayerContent({ song/*, songUrl*/}: Props) {
       audio.removeEventListener("ended", onPlayNext);
     };
   }, [dur_sec]);
+
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -156,7 +158,7 @@ export default function PlayerContent({ song/*, songUrl*/}: Props) {
       <div className="col-span-2 md:col-span-3 mt-2 ">
         <div className="flex justify-center">
         <span className="w-[80px]">{`${moment.utc(Math.ceil(progress) * 1000).format('HH:mm:ss')}`}</span>
-          <div className="w-[80%]"><SliderSong value={progress} max={duration} onChange={handleSeek} /></div>
+          <div className="w-[80%]"><SliderSong value={progress} loadedChunks={loadingProgress} max={duration} onChange={handleSeek} /></div>
           {durationTime}
           </div>
       </div>

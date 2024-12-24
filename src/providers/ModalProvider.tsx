@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import AuthModal from "../components/AuthModal";
 import SubscribeModal from "../components/SubscribeModal";
 import UploadModal from "../components/UploadModal";
+import PlaylistModal from "../components/PlaylistModal";
 import { ProductWithPrice } from "../types";
 
 type Props = {
@@ -25,6 +26,7 @@ export default function ModalProvider({ products }: Props) {
     <>
       <AuthModal />
       <UploadModal />
+      <PlaylistModal/>
       <SubscribeModal products={products} />
     </>
   );

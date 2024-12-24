@@ -8,96 +8,73 @@ const useChunkLoader = (songId: string, duration: number) => {
   const fileSizeRef = useRef<number | null>(null);
   const [fullFileDownloaded, setFullFileDownloaded] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
-  let loadedBytes = 0;
+  const pendingSeekTimeRef = useRef<number | null>(null);
+  const loadedBytes = useRef<number>(0);
+
   let receivedChunks: { id: number, chunk: ArrayBuffer }[] = [];
   let chunkIdCounter = 0;
   let pendingChunks: { id: number, chunk: ArrayBuffer }[] = [];
   let isAppending = false;
 
-useEffect(() => {
-  console.log('Initializing WebSocket connection...');
-  const socket = new WebSocket("ws://localhost:3001");
-  socket.onopen = () => {
-    console.log('WebSocket connection established');
-    wsRef.current = socket;
-    requestNextChunk(0);
-  };
-  socket.onclose = () => {
-    console.log('WebSocket connection closed');
-    wsRef.current = null;
-  };
-
-  socket.onerror = (error) => {
-    console.error('WebSocket error:', error);
-  };
-
-  socket.onmessage = (event) => {
-      if (typeof event.data === 'string') {
-      const data = JSON.parse(event.data);
-      if(data.done == true){
-      setFullFileDownloaded(data.done);
-      }
-      //console.log(fullFileDownloaded);
-      //console.log(data.done);
-
-      if (data.fileSize) {
-        fileSizeRef.current = data.fileSize;
-      }
-
-      if (data.error) {
-        console.error(data.error);
-      }
-    } else if (event.data instanceof Blob) {
-      event.data.arrayBuffer().then((chunk) => {
-        const id = chunkIdCounter++;
-          receivedChunks.push({ id, chunk });
-          processReceivedChunks();
-      });
-    }
-  };
-
-  return () => {
-    socket.close();
-  };
-}, [songId]);
-
 const requestNextChunk = (startByte: number) => {
-  if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && !fullFileDownloaded) {
+  if (wsRef.current && 
+      wsRef.current.readyState === WebSocket.OPEN && 
+      !fullFileDownloaded
+    ) {
     wsRef.current.send(JSON.stringify({ songId, startByte }));
   }
 };
-
-/*const fetchAndAppendChunk = (startByte: number) => {
-  if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && !fullFileDownloaded) {
-    wsRef.current.send(JSON.stringify({ songId, startByte}));
-    //console.log(`Requested chunk from byte ${startByte}`);
-  } else {
-    console.warn('WebSocket is not open. Cannot fetch chunk.');
-  }
-};*/
 
 const processReceivedChunks = () => {
   receivedChunks.sort((a, b) => a.id - b.id);
     pendingChunks = pendingChunks.concat(receivedChunks);
     receivedChunks = [];
     appendPendingChunks();
+    
 };
 
 const appendPendingChunks = () => {
-  if (isAppending) return;
+  if (isAppending) {
+    return;
+  }
   if (sourceBufferRef.current && !sourceBufferRef.current.updating && pendingChunks.length > 0) {
     isAppending = true;
     const { chunk } = pendingChunks.shift()!;
     sourceBufferRef.current.appendBuffer(new Uint8Array(chunk));
-    loadedBytes += chunk.byteLength;
+    loadedBytes.current += chunk.byteLength;
     isAppending = false;
     appendPendingChunks();
-    
-    console.log(`Loaded bytes: ${loadedBytes}`);
+
+
+    const audio = audioRef.current;
+    const bufferedEnd = audio.buffered.length > 0 
+      ? audio.buffered.end(audio.buffered.length - 1) 
+      : 0;
+
+    if (pendingSeekTimeRef.current !== null && bufferedEnd >= pendingSeekTimeRef.current) {
+      audio.currentTime = pendingSeekTimeRef.current;
+      audio.play();
+      pendingSeekTimeRef.current = null; // Сбрасываем временное значение
+    }
+    else if(pendingSeekTimeRef.current !== null && bufferedEnd <= pendingSeekTimeRef.current && isAppending == false){
+      requestNextChunk(loadedBytes.current);
+    }
+
+    const progress = fileSizeRef.current ? (loadedBytes.current / fileSizeRef.current) * 100 : 0;
+    setLoadingProgress(progress);
   }
 };
 
+
+/*useEffect(() => {
+  const intervalId = setInterval(() => {
+    if(pendingSeekTimeRef.current === null) requestNextChunk(loadedBytes.current);
+  }, 250); 
+
+  return () => clearInterval(intervalId);
+}, [loadedBytes, fullFileDownloaded]);*/
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -108,13 +85,14 @@ const appendPendingChunks = () => {
       sourceBufferRef.current = mediaSource.addSourceBuffer('audio/mpeg');
       sourceBufferRef.current.addEventListener('updateend', () => {
         isAppending = false;
-        appendPendingChunks(); // Attempt to append more chunks when possible
+        appendPendingChunks();
       });
 
       audio.addEventListener('timeupdate', async () => {
         const bufferedEnd = audio.buffered.end(audio.buffered.length - 1);
-        if (audio.currentTime > bufferedEnd - 40 && !fullFileDownloaded) {
-          await requestNextChunk(loadedBytes);
+        if ((audio.currentTime > bufferedEnd - 40 || audio.currentTime > bufferedEnd)&& !fullFileDownloaded && pendingSeekTimeRef.current === null) {
+          console.log(bufferedEnd);
+          await requestNextChunk(loadedBytes.current);
         }
       });
     };
@@ -128,32 +106,77 @@ const appendPendingChunks = () => {
     };
   }, [songId]);
 
-  let bytePosition = 0;
   const handleSeek = async (value: number) => {
     const audio = audioRef.current;
-    if (!isNaN(value) && isFinite(value)) {
-      const bufferedEnd = audio.buffered.end(audio.buffered.length - 1);
-      if (value > bufferedEnd) {
-        if (fileSizeRef.current) { 
-        bytePosition = Math.floor((value / duration) * fileSizeRef.current!);
-        if (bytePosition <= fileSizeRef.current && !fullFileDownloaded) {
-        await requestNextChunk(bytePosition);
-      } else {
-        console.warn(`Attempted to fetch beyond file size. Byte position: ${bytePosition}, File size: ${fileSizeRef.current}`);
+    const bufferedEnd = audio.buffered.length > 0 
+      ? audio.buffered.end(audio.buffered.length - 1) 
+      : 0;
+    if (value > bufferedEnd) {
+      pendingSeekTimeRef.current = value;
+      
+      if (fileSizeRef.current) {
+        if (loadedBytes.current <= fileSizeRef.current && !fullFileDownloaded) {
+          await requestNextChunk(loadedBytes.current);
+        }
       }
     } else {
-      console.warn("File size is not initialized.");
-    }
-  }
       audio.currentTime = value;
+
+      pendingSeekTimeRef.current = null; // Если данные уже есть, обновляем сразу
     }
   };
+  
+
+  useEffect(() => {
+    const socket = new WebSocket("ws://localhost:3001");
+    socket.onopen = () => {
+      console.log('WebSocket connection established');
+      wsRef.current = socket;
+      requestNextChunk(0);
+    };
+    socket.onclose = () => {
+      console.log('WebSocket connection closed');
+      wsRef.current = null;
+    };
+  
+    socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+  
+    socket.onmessage = (event) => {
+        if (typeof event.data === 'string') {
+        const data = JSON.parse(event.data);
+        if(data.done == true){
+        setFullFileDownloaded(data.done);
+        }
+  
+        if (data.fileSize) {
+          fileSizeRef.current = data.fileSize;
+        }
+  
+        if (data.error) {
+          console.error(data.error);
+        }
+      } else if (event.data instanceof Blob) {
+        event.data.arrayBuffer().then((chunk) => {
+          const id = chunkIdCounter++;
+            receivedChunks.push({ id, chunk });
+            processReceivedChunks();
+        });
+      }
+    };
+  
+    return () => {
+      socket.close();
+    };
+  }, [songId]);
 
   return {
     audioRef,
     mediaSourceRef,
     handleSeek,
     fullFileDownloaded,
+    loadingProgress
   };
 };
 

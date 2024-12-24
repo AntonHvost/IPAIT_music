@@ -63,7 +63,7 @@ export default function Sidebar({ children, songs }: Props) {
   );
   return (
     <div className={twMerge(`flex h-full`, activeId && "h-[calc(100%-80px)]")}>
-      <div className="hidden h-full w-[300px] flex-col gap-y-2 bg-oxford_blue p-2 md:flex">
+      <div className="hidden h-full w-[300px] flex-col gap-y-2 bg-stone-800 p-2 md:flex">
         <Box>
           <div className="flex flex-col gap-y-4 px-5 py-4">
             {routes.map((item) => (

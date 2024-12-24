@@ -6,19 +6,5 @@ module.exports = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme:{
-    colors: {
-      transparent: 'transparent',
-      current: 'currentColor',
-      delft_blue: {
-        DEFAULT: '#26334d',
-        light: '#56AEFF',
-      },
-      oxford_blue:{
-        DEFAULT: '#101935',
-      },
-      antiflash_white:'#EDF2F4',
-      pink: '#FC8BFD',
-      
-    },
   },
 };

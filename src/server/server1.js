@@ -14,8 +14,8 @@ const cors = require('cors');
 const { data } = require('autoprefixer');
 const e = require('express');
 
-const supabaseUrl = "https://ihlnjluvhimtwklrixbg.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlobG5qbHV2aGltdHdrbHJpeGJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjExMzcyODgsImV4cCI6MjAzNjcxMzI4OH0.MPBffTzRBj086odxgZMUTVskWVgnVOyIyqkLV9m56Wc";
+const supabaseUrl = "https://radpotwcobscdlmnuqsb.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhZHBvdHdjb2JzY2RsbW51cXNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA4NDc5NTksImV4cCI6MjA0NjQyMzk1OX0.5g9sv0mxahT7QdWqyai5x6W2zmNKqDlv1gcNPAvC6YM";
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -125,7 +125,7 @@ wss.on('connection', (ws) => {
 function streamFile(filePath, startByte, ws) {
     const stat = fs.statSync(filePath);
     const fileSize = stat.size;
-    const chunkSize = 1024 * 1024;
+    const chunkSize = Math.min(1024 * 56, fileSize);;
     let chunkId = 0;
     if(startByte > fileSize - 1){
         ws.send(JSON.stringify({done : true}));

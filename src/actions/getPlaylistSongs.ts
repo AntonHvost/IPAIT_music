@@ -2,15 +2,17 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { Song } from "../types";
 
-export async function getLikedSongs(): Promise<Song[]> {
+export async function getPlaylistSongs(): Promise<Song[]> {
   const supabase = createServerComponentClient({
     cookies,
   });
-  const { data: { session } } = await supabase.auth.getSession();
   const { data, error } = await supabase
-    .from("liked_songs")
+    .from("playlist_items")
     .select("*, songs(*)")
-    .eq("user_id", session?.user?.id);
+    .eq("id_playlist", supabase
+        .from("playlists")
+        .select("id")
+    );
   if (error) {
     console.log(error.message);
     return [];

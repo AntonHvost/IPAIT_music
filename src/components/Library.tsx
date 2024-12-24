@@ -34,7 +34,7 @@ export default function Library({ songs }: Props) {
       <div className="flex items-center justify-between px-5 pt-4">
         <div className="inline-flex items-center gap-x-2">
           <TbPlaylist size={26} className="text-neutral-400" />
-          <p className="font-medium text-neutral-400">Your Library</p>
+          <p className="font-medium text-neutral-400">Моя библиотека</p>
         </div>
         <AiOutlinePlus
           onClick={onClick}

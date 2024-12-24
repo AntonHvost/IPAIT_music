@@ -40,7 +40,7 @@ export default function Header({ children, className }: Props) {
         `
           h-fit
           bg-gradient-to-b
-          from-emerald-800
+          from-indigo-900
           p-6
         `,
         className
@@ -73,7 +73,7 @@ export default function Header({ children, className }: Props) {
           {user ? (
             <div className="flex items-center gap-x-4">
               <Button onClick={handleLogout} className="bg-white px-6 py-2">
-                Logout
+                Выйти
               </Button>
               <Button
                 onClick={() => router.push("/account")}

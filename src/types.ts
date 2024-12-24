@@ -2,13 +2,25 @@ import Stripe from "stripe";
 
 export type Song = {
   id: string;
-  user_id: string;
   author: string;
   title: string;
   song_path: string;
   image_path: string;
   duration: string;
 };
+
+export type Playlist = {
+  id: string;
+  name: string;
+  image: string;
+}
+
+export interface FormData {
+  title: string;
+  author: string;
+  image: File | null;
+  song: File | null;
+}
 
 export type UserDetails = {
   id: string;

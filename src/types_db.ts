@@ -23,6 +23,20 @@ export interface Database {
           stripe_customer_id?: string | null;
         };
       };
+      user_songs: {
+        Row: {
+          id_song: number;
+          id_user: string;
+        };
+        Insert: {
+          id_song: number;
+          id_user: string;
+        };
+        Update: {
+          id_song: number;
+          id_user: string;
+        };
+      };
       liked_songs: {
         Row: {
           created_at: string | null;
@@ -31,13 +45,50 @@ export interface Database {
         };
         Insert: {
           created_at?: string | null;
-          song_id: number;
-          user_id: string;
+          song_id?: number;
+          user_id?: string;
         };
         Update: {
           created_at?: string | null;
           song_id?: number;
           user_id?: string;
+        };
+      };
+      playlists: {
+        Row: {
+          id: number;
+          user_id: string;
+          name: string;
+          created_at: string | null;
+          image_path: string | null;
+        };
+        Insert: {
+          id?: number;
+          user_id?: string;
+          name?: string;
+          created_at?: string | null;
+          image_path?: string | null;
+        };
+        Update: {
+          id?: number;
+          user_id?: string;
+          name?: string;
+          created_at?: string | null;
+          image_path?: string | null;
+        };
+      }
+      playlist_items: {
+        Row: {
+          id_playlist: number;
+          id_song: string;
+        };
+        Insert: {
+          id_playlist?: number;
+          id_song?: string;
+        };
+        Update: {
+          id_playlist?: number;
+          id_song?: string;
         };
       };
       prices: {
@@ -119,7 +170,6 @@ export interface Database {
           image_path: string | null;
           song_path: string | null;
           title: string | null;
-          user_id: string | null;
           duration: string | null;
         };
         Insert: {
@@ -129,7 +179,6 @@ export interface Database {
           image_path?: string | null;
           song_path?: string | null;
           title?: string | null;
-          user_id?: string | null;
         };
         Update: {
           author?: string | null;
@@ -138,7 +187,6 @@ export interface Database {
           image_path?: string | null;
           song_path?: string | null;
           title?: string | null;
-          user_id?: string | null;
         };
       };
       subscriptions: {

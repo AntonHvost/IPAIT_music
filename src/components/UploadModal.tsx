@@ -13,6 +13,7 @@ import Input from "./Input";
 import Modal from "./Modal";
 import { parseBuffer } from 'music-metadata-browser';
 import { Tomorrow } from "next/font/google";
+import { title } from "process";
 
 export default function UploadModal() {
   const [isLoading, setIsLoading] = useState(false);
@@ -59,14 +60,16 @@ export default function UploadModal() {
         tmp_duration = metadata.format.duration ? Math.ceil(metadata.format.duration) : 0;
         duration = moment.utc(tmp_duration * 1000).format('HH:mm:ss');
         console.log(duration);
+        console.log(values.title);
       } catch (error) {
         console.error("Error parsing song metadata:", error);
         duration = 0;
       }
       // upload song
+      
       const { data: songData, error: songError } = await supabaseClient.storage
         .from("songs")
-        .upload(`song-${values.title}-${uniqueID}`, songFile, {
+        .upload(`song-${values.author}-${uniqueID}`, songFile, {
           cacheControl: "3600",
           upsert: false,
         });
@@ -79,7 +82,7 @@ export default function UploadModal() {
       const { data: imageData, error: imageError } =
         await supabaseClient.storage
           .from("images")
-          .upload(`image-${values.title}-${uniqueID}`, imageFile, {
+          .upload(`image-${values.author}-${uniqueID}`, imageFile, {
             cacheControl: "3600",
             upsert: false,
           });
@@ -88,9 +91,7 @@ export default function UploadModal() {
         return toast.error("Failed image upload.");
       }
 
-      const { error: supabaseError } = await supabaseClient
-        .from("songs")
-        .insert({
+        const {error: transactionError } = await supabaseClient.rpc("add_song_and_user_song", {
           user_id: user.id,
           title: values.title,
           author: values.author,
@@ -98,10 +99,11 @@ export default function UploadModal() {
           song_path: songData.path,
           duration: duration,
         });
-      if (supabaseError) {
-        setIsLoading(false);
-        return toast.error(supabaseError.message);
-      }
+        
+        if (transactionError) {
+          setIsLoading(false);
+          return toast.error(transactionError.message);
+        }
 
       router.refresh();
       setIsLoading(false);
@@ -119,21 +121,21 @@ export default function UploadModal() {
     <Modal
       isOpen={isOpen}
       onChange={onChange}
-      title="Add a song"
-      description="Upload an mp3 file"
+      title="Добавить музыку"
+      description="Загрузите mp3 файл"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-4">
         <Input
           id="title"
           disabled={isLoading}
           {...register("title", { required: true })}
-          placeholder="Song title"
+          placeholder="Название"
         />
         <Input
           id="author"
           disabled={isLoading}
           {...register("author", { required: true })}
-          placeholder="Song author"
+          placeholder="Автор"
         />
         <div>
           <div className="pb-1">Select a song file</div>
@@ -156,7 +158,7 @@ export default function UploadModal() {
           />
         </div>
         <Button disabled={isLoading} type="submit">
-          Create
+          Загрузить
         </Button>
       </form>
     </Modal>

@@ -5,16 +5,18 @@
 type Props = {
   value?: number;
   max: number;
+  loadedChunks: number;
   onChange?: (value: number) => void;
 };
 
-export default function Slider({ value, max, onChange }: Props) {
+export default function Slider({ value, max, loadedChunks, onChange }: Props) {
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange?.(Number(e.target.value));
-    console.log(max);
+   // console.log(e.target.value);
   };
   return (
-      <input
+    <div className="relative w-full h-2 bg-gray-300 rounded-lg cursor-pointer">
+    <input
       type="range"
       min="0"
       max={max}
@@ -22,18 +24,10 @@ export default function Slider({ value, max, onChange }: Props) {
       onChange={handleSliderChange}
       className="w-full h-2 bg-gray-300 rounded-lg cursor-pointer"
     />
-    
-    /*<Root
-      className="relative flex h-10 w-full touch-none select-none items-center"
-      defaultValue={[1]}
-      value={[value!]}
-      onChange={handleSliderChange}
-      max={max}
-      step={0.1}
-    >
-      <Track className="relative h-[3px] grow rounded-full bg-antiflash-white">
-        <Range className="absolute h-full rounded-full bg-antiflash_white" />
-      </Track>
-    </Root>*/
+    <div
+      className="absolute top-0 left-0 h-2 bg-pink rounded-full"
+      style={{ width: `${loadedChunks}%` }}
+    />
+  </div>
   );
 }

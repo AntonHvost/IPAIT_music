@@ -14,7 +14,7 @@ const Button = forwardRef<HTMLButtonElement, Props>(
             rounded-full
             border
             border-transparent
-            bg-pink
+            bg-violet-800
             px-3
             py-3
             font-bold

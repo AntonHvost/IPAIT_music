@@ -4,14 +4,18 @@ import Image from "next/image";
 import useLoadImage from "../hooks/useLoadImage";
 import { Song } from "../types";
 import PlayButton from "./PlayButton";
+import OptionButton from "./OptionButton";
+import { useUser } from "@/hooks/useUser";
 
 type Props = {
   data: Song;
   onClick: (id: string) => void;
 };
 
-export default function SongItem({ data, onClick }: Props) {
-  const imagePath = useLoadImage(data);
+export default function SongItem({ data, onClick}: Props) {
+  const imagePath = useLoadImage(data.image_path);
+  const user = useUser();
+
   return (
     <div
       onClick={() => onClick(data.id)}
@@ -25,11 +29,15 @@ export default function SongItem({ data, onClick }: Props) {
           alt="Image"
         />
       </div>
+      <div className="flex w-full items-center justify-around">
       <div className="flex w-full flex-col items-start gap-y-1 pt-4">
         <p className="w-full truncate font-semibold">{data.title}</p>
         <p className="w-full truncate pb-4 text-sm text-neutral-400">
           By {data.author}
         </p>
+      </div>
+      {user ? (<div className=""><OptionButton songId={data.id}/></div>) : (<></>)}
+      
       </div>
       <div className="absolute bottom-24 right-5">
         <PlayButton />

@@ -8,7 +8,7 @@ type Props = {
   songs: Song[];
 };
 
-export default function PageContent({ songs }: Props) {
+export default function PageContentUser({ songs }: Props) {
   const onPlay = useOnPlay(songs);
   //const onAddToPlaylist = useAddToPlaylist(songs);
 

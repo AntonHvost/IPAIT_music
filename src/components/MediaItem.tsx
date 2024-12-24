@@ -11,7 +11,7 @@ type Props = {
 };
 
 export default function MediaItem({ data, onClick }: Props) {
-  const imageUrl = useLoadImage(data);
+  const imageUrl = useLoadImage(data.image_path);
   const { setId } = usePlayer();
 
   const handleClick = () => {

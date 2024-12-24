@@ -71,7 +71,7 @@ export default function LikeButton({ songId }: Props) {
 
   return (
     <button className="transition hover:opacity-75" onClick={handleLike}>
-      <Icon color={isLiked ? "#22c55e" : "white"} size={25} />
+      <Icon color={isLiked ? "#c773d9" : "white"} size={25} />
     </button>
   );
 }

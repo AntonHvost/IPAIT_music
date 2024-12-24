@@ -19,7 +19,7 @@ export default function Slider({ value, max, onChange }: Props) {
       value={[value!]}
       onValueChange={handleChange}
       max={max}
-      step={0.1}
+      step={0.02}
       aria-label="Volume"
     >
       <Track className="relative h-[3px] grow rounded-full bg-neutral-600">
